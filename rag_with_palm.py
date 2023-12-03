@@ -39,10 +39,3 @@ class RAGPaLMQuery:
         response = self.query_engine.chat(query)
         return response
 
-
-# Instantiate the class
-rag_palm_query_instance = RAGPaLMQuery()
-
-# Example query and response
-query_result = rag_palm_query_instance.query_response("what is the vlc build")
-print(query_result)
