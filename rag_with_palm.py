@@ -2,7 +2,7 @@ from llama_index import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.embeddings import HuggingFaceEmbedding
 from llama_index.llms.palm import PaLM
 from llama_index import ServiceContext
-from llama_index import StorageContext
+from llama_index import Prompt
 import os
 
 
@@ -16,7 +16,7 @@ class RAGPaLMQuery:
         self.documents = SimpleDirectoryReader("./data").load_data()
 
         # Set up API key for PaLM
-        os.environ['GOOGLE_API_KEY'] = 'your api key'
+        os.environ['GOOGLE_API_KEY'] = 'AIzaSyA0jKknXYAGfOxAbTvBx-2vbKUKf_GyIVs'
 
         # Initialize PaLM and Hugging Face embedding model
         self.llm = PaLM()
@@ -31,11 +31,20 @@ class RAGPaLMQuery:
         # Persist the index to storage
         self.index.storage_context.persist()
 
+        template = (
+            "We have provided context information below. \n"
+            "---------------------\n"
+            "{context_str}"
+            "\n---------------------\n"
+            "Given this information, please answer the question if the answer is not in given context should reply with sorry. {query_str}\n"
+            )
+        qa_template = Prompt(template)
+
         # Create a query engine
-        self.query_engine = self.index.as_chat_engine()
+        self.query_engine = self.index.as_query_engine(text_qa_template=qa_template)
 
     def query_response(self, query):
         # Perform a query
-        response = self.query_engine.chat(query)
+        response = self.query_engine.query(query)
         return response
 
